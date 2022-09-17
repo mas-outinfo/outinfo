@@ -1,3 +1,3 @@
 #
-# REQUIREMENTS : list of Python packages required to run notebooks in repository
+# REQUIREMENTS : list of Python packages required to run notebooks in this repository
 #
