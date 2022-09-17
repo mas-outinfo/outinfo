@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- Auteurs français du XIXe siècle -->
+
+<auteurs>
+  <auteur nom="Hugo" prénom="Victor"
+    naissance="26/02/1802 Besançon" décès="22/05/1885 Paris" />
+  <auteur nom="Baudelaire" prénom="Charles"
+    naissance="09/04/1821 Paris" décès="31/08/1867 Paris" />
+  <auteur nom="Rimbaud" prénom="Arthur"
+    naissance="20/10/1854 Charleville" décès="10/11/1891 Marseille" />
+</auteurs>
+
