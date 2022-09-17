@@ -1,0 +1,4 @@
+#
+# RUNTIME : version of Python required to run notebooks in this repository
+#
+python-3.9
