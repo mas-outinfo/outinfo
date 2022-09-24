@@ -7,7 +7,7 @@ __date__    = "2022-06-01"
 # ==================================================================================================
 def show(string):
   """split, eval, print a string containing python expressions separated by semi-colons"""
-  from inspect import stack
+  from inspect import stack; from pprint import pprint
   namespace = stack()[1][0].f_globals # get global namespace from caller
   namespace = dict((k,v) for (k,v) in namespace.items() if k[0] != '_')
   for exp in string.split(';'):
@@ -15,8 +15,8 @@ def show(string):
     head, exp = (head, exp[1:]) if head == '*' else ('', exp) 
     tail, exp = (tail, exp[:-1]) if tail == '#' else ('', exp)
     val = eval(exp, namespace) if exp else ''
-    if exp: print(head+exp if head else exp, '=', end=('\n' if tail else ' '))
-    print(*val) if head else print(val)
+    if exp: print(head+exp if head else exp, '=\n' if tail else '= ', end='')
+    print(*val) if head else pprint(val) if tail else print(val)
 # --------------------------------------------------------------------------------------------------
 def load(filename, split=True, strip=True, clean=True, comment='#', encoding='utf8'):
   """load content of provided text file and perform split/strip/clean tasks
