@@ -2,6 +2,6 @@
 # REQUIREMENTS : list of Python packages required to run notebooks in this repository
 #
 numpy
-#matplotlib
+matplotlib
 #pandas
 #scipy
