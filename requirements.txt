@@ -3,5 +3,7 @@
 #
 numpy
 matplotlib
-#pandas
+pandas
+seaborn
+folium
 #scipy
