@@ -6,4 +6,5 @@ matplotlib
 pandas
 seaborn
 folium
+lxml
 #scipy
