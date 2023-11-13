@@ -8,18 +8,17 @@ __date__    = "2022-06-01"
 def show(string):
   """split, eval, print a string containing python expressions separated by semi-colons
   - optional prefix for expression : '*' = unpack items for iterable expression
-  - optional suffix for expression : '#' = replace regular print by pretty print"""
-  from inspect import stack; from pprint import pprint
+  - optional suffix for expression : '#' = insert newline before printing expression"""
+  from inspect import stack
   namespace = stack()[1][0].f_globals # get global namespace from caller
   namespace = dict((k,v) for (k,v) in namespace.items() if k[0] != '_')
-  select = (('➤ ', print), ('➤\n', pprint)) # use either regular or pretty print
   for exp in string.split(';'):
     exp = exp.strip(); head, tail = exp[:1], exp[-1:]
     head, exp = ('*', exp[1:]) if head == '*' else ('', exp) 
-    printer, tail, exp = (pprint, ' ➤\n', exp[:-1]) if tail == '#' else (print, ' ➤ ', exp)
+    tail, exp = (' ➤\n', exp[:-1]) if tail == '#' else (' ➤ ', exp)
     if not exp: print(); continue # insert blank line if expression is empty
     val = eval(exp, namespace); print(head + exp + tail, end='')
-    print(*val) if head else print(val) if isinstance(val, str) else printer(val)
+    print(*val) if head else print(val)
 # --------------------------------------------------------------------------------------------------
 def view(image, mode=None, clamp=None, file=None):
   """display image with optional image conversion or clamping
