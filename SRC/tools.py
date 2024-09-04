@@ -30,6 +30,7 @@ def view(image, mode=None, clamp=None, file=None):
   assert isinstance(image, (np.ndarray, pim.Image)), 'wrong data for image'
   assert isinstance(clamp, (type(None), tuple)), 'wrong range for clamping'
   if isinstance(image, pim.Image): image = np.array(image.convert('RGB') if image.mode == 'P' else image)
+  elif image.ndim == 3 and image.shape[2] == 1: image = image[:,:,0] # convert to 'L' mode
   if not clamp: hi = image.max(); clamp = (0, hi if hi else 1)
   lo, hi = clamp; image = (np.clip(image, lo, hi) - lo) / (hi - lo) * 255
   image = pim.fromarray(image.astype('u1'))
@@ -103,31 +104,44 @@ def inspect(object, detail=0, width=96):
     if properties: print("\n● %s\n%s" % (groups[2], fold(properties, width)))
     if methods: print("\n● %s\n%s" % (groups[3], fold(methods, width)))
 # --------------------------------------------------------------------------------------------------
-def load(filename, split=True, strip=True, clean=True, comment='#', encoding='utf8'):
+def load(location, split='\n', comment='#', subsplit='', subcomment='', strip=True, encoding='utf8'):
   """load content of provided text file and perform split/strip/clean tasks
-  - filename:str = path to file on disk
-  - split:bool = split file content to return list of lines instead of multi-line string
-  - strip:bool = remove boundary whitespaces for each line
-  - clean:bool = remove empty lines and comment lines
-  - comment:char = prefix char defining comment lines
+  - location:str = path to local file or url to distant file via HTTP or HTTPS
+  - split:str = pattern used as first level separator (None or '' means no split)
+  - comment:str = pattern used as comment prefix on split level
+  - subsplit:str = pattern used as second level separator (None or '' means no subsplit)
+  - subcomment:str = pattern used as comment prefix on subsplit level
+  - strip:bool = remove boundary whitespaces for whole content and for each split level
   - encoding:str = character encoding used for file reading"""
-  with open(filename, 'r', encoding=encoding) as file: text = file.read()
-  if strip: text = text.strip() # strip whole content
-  if not split: return text # return content as a multi-line string
-  text = text.split('\n') # split into lines
-  if strip: text = [line.strip() for line in text]
-  if not clean: return text # return content as a list of lines
-  text = [line for line in text if line and line[0] != comment] # clean comments and empty lines
-  return text # return content as a list of cleaned lines
+  from urllib.parse import urlparse; from urllib.request import urlopen, Request
+  url = urlparse(location) # check whether provided string is a valid URL
+  if url.scheme == '': # load local file when no scheme as prefix
+    with open(location, 'r', encoding=encoding) as file: text = file.read() # read and decode content
+  elif url.scheme[:4] == 'http': # load distant file when HTTP or HTTPS scheme
+    location = Request(location, None, {'User-Agent':'Mozilla/5.0'}) # request as Mozilla user agent
+    with urlopen(location) as file: text = file.read().decode(encoding) # read and decode content
+  else: raise NotImplementedError(f"'{url.scheme}:' protocol not supported yet")
+  if not split: return text.strip() if strip else text # return content as a multi-line string
+  # ------------------------------------------------------------------------------------------------
+  text = text.split(split) # apply first level split on text (= blocks)
+  if strip: text = [s.strip() for s in text] # apply whitespace stripping on each block
+  if comment: text = [s for s in text if s and not s.startswith(comment)] # remove comment blocks
+  if not subsplit: return text # return content as a list of strings
+  # ------------------------------------------------------------------------------------------------
+  text = [s.split(subsplit) for s in text] # apply second level split on text (= lines)
+  for n in range(len(text)): # loop over blocks
+    if strip: text[n] = [s.strip() for s in text[n]] # apply whitespace stripping on each line
+    if subcomment: text[n] = [s for s in text[n] if s and not s.startswith(subcomment)] # remove comment lines
+  return text # return content as a list of lists of strings
 # --------------------------------------------------------------------------------------------------
-def save(filename, body='', head='', append=False, comment='# ', encoding='utf8'):
-  """save string or iterable into provided text file with optional comment header
-  Optional keyword arguments :
+def save(location, body='', head='', append=False, comment='# ', encoding='utf8'):
+  """save string or iterable into text file with optional comment header
+  - location:str = absolute or relative path to local file
   - body:str|list|tuple = content for file body (converted into data lines)
   - head:str|list|tuple = content for file head (converted into comment lines)
   - append:bool : append head+body at existing content, instead of overwrite
   - comment:char = prefix char defining comment lines
-  - encoding:str = character encoding used for file reading"""
+  - encoding:str = character encoding used for file"""
   if head: # process header data
     if not isinstance(head,str): head = '\n'.join(str(line) for line in head)
     head = comment + head.replace('\n','\n'+comment) + '\n' # add comment prefixes
@@ -135,7 +149,17 @@ def save(filename, body='', head='', append=False, comment='# ', encoding='utf8'
     if not isinstance(body,str): body = '\n'.join(str(line) for line in body)
     if body[-1] != '\n': body += '\n' # add final newline if missing
   mode = 'wa'[append] # select either 'write' or 'append' mode
-  with open(filename, mode, encoding=encoding) as file: file.write(head + body)
+  with open(location, mode, encoding=encoding) as file: file.write(head + body)
+# --------------------------------------------------------------------------------------------------
+def fetch(url, encoding='utf8'):
+  """open provided url and return content either as a StringIO or BytesIO stream"""
+  from urllib.request import urlopen, Request; from io import StringIO, BytesIO
+  header = {'User-Agent':'Mozilla/5.0'} # use Mozilla/Firefox user agent
+  content = urlopen(Request(url, None, header)) # connect or raise error
+  mime = content.getheader('Content-Type') # get mimetype of content
+  if 'text/' in mime or 'xml' in mime or 'json' in mime: # content is text-based
+    return StringIO(content.read().decode(encoding)) # convert content into StringIO
+  else: return BytesIO(content.read()) # convert content into BytesIO
 # --------------------------------------------------------------------------------------------------
 def hscroll(activate=True):
   """activate/deactivate horizontal scrolling for wide output (> 120 chars)"""
