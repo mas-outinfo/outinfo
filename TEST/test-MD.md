@@ -1,7 +1,7 @@
 ## Auteurs français du XIXe siècle
 
 
-| Nom | Prénom | Date de naissance | Lieu de naissance | Date de décès | Lieu de décès |
+| Nom | Prénom | NaissanceDate | NaissanceLieu | DécèsDate | DécèsLieu |
 | :---: | :---: | :---: | :---: | :---: | :---: |
 | Hugo | Victor | 26/02/1802 | Besançon | 22/05/1885 | Paris |
 | Baudelaire | Charles | 09/04/1821 | Paris | 31/08/1867 | Paris |
