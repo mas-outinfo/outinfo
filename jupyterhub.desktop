@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=JupyterHub
+Comment=
+Type=Application
+Version=1.0
+Exec=firefox https://jupyterhub.emi.u-bordeaux.fr
+Path=$HOME
+Icon=applications-python
+Terminal=false
+StartupNotify=false
