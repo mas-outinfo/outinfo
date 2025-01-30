@@ -1,5 +1,5 @@
 #
-# REQUIREMENTS : list of Python packages required to run notebooks in this repository
+# REQUIREMENTS : Python packages required to run notebooks in this repository
 #
 numpy
 matplotlib
