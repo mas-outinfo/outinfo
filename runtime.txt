@@ -1,3 +1,0 @@
-#
-# RUNTIME : version of Python required to run notebooks in this repository
-#
