@@ -1,0 +1,21 @@
+#
+# Auteurs français du XIXe siècle
+#
+
+[[auteurs]] # création d'une liste 'auteurs' contenant des tables
+Nom = "Hugo"
+"Prénom" = "Victor" # Prénom mis entre quotes à cause du caractère non ASCII (é)
+Naissance = "26/02/1802 Besançon"
+"Décès" = "22/05/1885 Paris" # idem pour Décès
+
+[[auteurs]] # ajout d'un deuxième élément dans la même liste
+Nom = "Baudelaire"
+"Prénom" = "Charles"
+Naissance = "09/04/1821 Paris"
+"Décès" = "31/08/1867 Paris"
+
+[[auteurs]]
+Nom = "Rimbaud"
+"Prénom" = "Arthur"
+Naissance = "20/10/1854 Charleville"
+"Décès" = "10/11/1891 Marseille"
