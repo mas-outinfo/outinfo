@@ -1,0 +1,11 @@
+<svg viewBox='0 0 800 240' xmlns='http://www.w3.org/2000/svg'>
+  <g fill='#EEE' stroke='#000' stroke-width='2'>
+    <rect x='25' y='25' width='700' height='200' rx='25' stroke-width='4'/>
+    <ellipse cx='100' cy='125' rx='50' ry='75' fill='#F00'/>
+    <ellipse cx='210' cy='125' rx='50' ry='75' fill='#0F0'/>
+    <ellipse cx='320' cy='125' rx='50' ry='75' fill='#00F'/>
+    <ellipse cx='430' cy='125' rx='50' ry='75' fill='#0FF'/>
+    <ellipse cx='540' cy='125' rx='50' ry='75' fill='#F0F'/>
+    <ellipse cx='650' cy='125' rx='50' ry='75' fill='#FF0'/>
+  </g>
+</svg>

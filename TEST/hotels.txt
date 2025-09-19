@@ -1,0 +1,72 @@
+● Lister les différentes villes présentes dans la base de données, tri par ordre alphabétique
+-- Sélection des valeurs distinctes de la colonne 'city' dans la table 'hotels'
+SELECT DISTINCT city FROM hotels ORDER BY city
+
+● Extraire les hôtels de catégorie trois étoiles ou plus, tri descendant par nombre d'étoiles
+-- Extraction des lignes de 'hotels' puis filtre sur 'stars' et tri descendant
+SELECT * FROM hotels WHERE stars >= 3 ORDER BY stars DESC
+
+● Extraire les réservations dont la date d'arrivée est comprise entre le 2 et le 5 avril 2024
+-- Extraction des lignes de 'bookings' puis filtre sur 'arrival' et tri ascendant
+SELECT * FROM bookings WHERE arrival BETWEEN '2024-04-02' AND '2024-04-05' ORDER BY arrival
+
+● Lister les noms et prénoms des clients dont le nom commence par 'F'
+-- Extraction des colonnes 'name' et 'forename' de 'clients' puis filtre sur 'name'
+SELECT name, forename FROM clients WHERE name LIKE 'F%' ORDER BY name, forename
+
+● Trouver le nombre total de chambres, ainsi que les prix min et max, classés selon le type de chambre
+-- Regroupement des lignes de 'rooms' selon 'type' puis comptage et min/max sur 'price'
+SELECT type, COUNT(*) AS nb_rooms, MIN(price) as min, MAX(price) as max
+FROM rooms GROUP BY type ORDER BY min, max
+
+● Trouver le nombre total de chambres, ainsi que les prix min et max, classés selon la catégorie d'hôtel
+-- Jonction des tables 'hotels' et 'room' puis regroupement des lignes selon 'stars'
+SELECT h.stars, COUNT(r.IDroom) AS nb_rooms, MIN(r.price) AS min, MAX(r.price) AS max
+FROM hotels h JOIN rooms r ON h.IDhotel = r.IDhotel GROUP BY h.stars ORDER BY min, max
+
+● Lister les cinq chambres doubles les moins chères de Grenoble
+-- Même jonction que ci-dessus puis filtre combiné sur 'city', 'type' et 'price'
+SELECT DISTINCT h.city, h.name, h.stars, r.price
+FROM hotels h JOIN rooms r ON h.IDhotel = r.IDhotel
+WHERE h.city = 'Grenoble' AND r.type = 'double' ORDER BY r.price LIMIT 5
+
+● Trouver les hôtels avec dix chambres ou plus
+-- Même jonction que ci-dessus puis regroupement selon 'IDhotel' et comptage de chambres
+SELECT h.city, h.name, COUNT(*) AS nb_rooms
+FROM hotels h JOIN rooms r ON h.IDhotel = r.IDhotel
+GROUP BY h.IDhotel HAVING nb_rooms >= 10 ORDER BY nb_rooms DESC
+
+● Lister les clients qui sont présents au 1er avril 2024, triés selon leur date de départ
+-- Jonction de 'clients' et 'sellings' puis filtre sur 'arrival' et 'departure'
+SELECT DISTINCT c.name, c.forename, s.arrival, s.departure
+FROM clients c JOIN sellings s ON c.IDclient = s.IDclient
+WHERE s.arrival <= '2024-04-01' AND s.departure > '2024-04-01'
+ORDER BY s.departure, s.arrival
+
+● Calculer les durées de séjour (min, max, moyenne) pour chaque hôtel
+-- Jonction de 'hotels' avec une table temporaire 'tempo' puis calculs sur 'days'
+-- 'JULIANDAY(date)' convertit une date en entier (nb de jours écoulés depuis 01/01/-45)
+SELECT h.city, h.name, MIN(days) AS min, MAX(days) AS max, ROUND(AVG(days), 1) AS mean
+FROM ( SELECT IDhotel, (JULIANDAY(departure) - JULIANDAY(arrival)) AS days
+  FROM sellings) AS tempo -- création d'une table temporaire
+JOIN hotels h ON tempo.IDhotel = h.IDhotel GROUP BY h.IDhotel ORDER BY mean DESC
+
+● Trouver les cinq clients qui ont le plus dépensé pour leurs séjours
+-- Jonction d'une table auxiliaire 'prices' avec 'clients' puis calculs multiples
+WITH prices AS ( SELECT s.IDClient, s.IDHotel, s.IDRoom, r.price,
+  (JULIANDAY(s.departure) - JULIANDAY(s.arrival)) AS days -- création d'une table auxiliaire
+  FROM rooms r JOIN sellings s ON r.IDhotel = s.IDhotel AND r.IDroom = s.IDroom)
+SELECT c.name, c.forename, COUNT(*) AS stays, SUM(days) as days, SUM(price*days) AS expenses
+FROM prices p JOIN clients c ON p.IDClient = c.IDClient
+GROUP BY c.IDclient ORDER BY expenses DESC LIMIT 5
+
+● Calculer le chiffre d'affaires moyen par chambre pour chaque hôtel
+-- Jonction de la même table 'prices' avec 'hotels' puis calculs multiples
+WITH prices AS ( SELECT s.IDClient, s.IDHotel, s.IDRoom, r.price,
+  (JULIANDAY(s.departure) - JULIANDAY(s.arrival)) AS days -- création d'une table auxiliaire
+  FROM rooms r JOIN sellings s ON r.IDhotel = s.IDhotel AND r.IDroom = s.IDroom)
+SELECT h.city, h.name, nb_rooms, SUM(p.price*p.days) as revenue,
+ROUND(SUM(p.price*p.days) / nb_rooms, 1) AS mean_revenue
+FROM ( SELECT IDhotel, COUNT(*) as nb_rooms FROM rooms GROUP BY IDhotel) AS tempo
+JOIN prices p ON tempo.IDhotel = p.IDhotel JOIN hotels h ON p.IDhotel = h.IDhotel
+GROUP BY h.IDhotel ORDER BY mean_revenue DESC

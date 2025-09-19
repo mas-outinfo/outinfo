@@ -1,0 +1,11 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='-20 -20 40 40'>
+<circle r='19' stroke='#000' stroke-width='.5' fill='#FE0'/>
+<ellipse rx='2.5' ry='4' cx='-7' cy='-7' fill='#000'/>
+<ellipse rx='2.5' ry='4' cx=' 7' cy='-7' fill='#000'/>
+<path stroke='#000' stroke-width='.5' stroke-linecap='round' fill='none'
+  d='M  10.5,2.7 a 4,4,0 0,0  4,3'/>
+<path stroke='#000' stroke-width='.5' stroke-linecap='round' fill='none'
+  d='M -10.5,2.7 a 4,4,0 0,1 -4,3'/>
+<path fill='none' stroke='#000' stroke-width='.75'
+  d='M -12,5 A 13.5,13.5,0 0,0 12,5 A 13,13,0 0,1 -12,5'/>
+</svg>
